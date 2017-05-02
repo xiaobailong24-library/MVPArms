@@ -92,10 +92,9 @@ dependencies {
     compile rootProject.ext.dependencies["rxbinding-appcompat-v7"]
     compile rootProject.ext.dependencies["rxbinding-design"]
     compile rootProject.ext.dependencies["rxbinding-recyclerview-v7"]
-
-//    compile (rootProject.ext.dependencies['rxerrorhandler']){
-//        exclude module: 'rxjava'
-//    }
+    compile (rootProject.ext.dependencies['rxerrorhandler']){
+        exclude module: 'rxjava'
+    }
 
 
     //network

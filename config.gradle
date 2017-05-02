@@ -61,7 +61,7 @@ ext {
                 "rxbinding-appcompat-v7"   : "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:${version["rxBindingVersion"]}",
                 "rxbinding-design"         : "com.jakewharton.rxbinding2:rxbinding-design:${version["rxBindingVersion"]}",
                 "rxbinding-recyclerview-v7": "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:${version["rxBindingVersion"]}",
-//                "rxerrorhandler"           : "me.jessyan:rxerrorhandler:1.0.1",
+                "rxerrorhandler"           : "com.github.xiaobailong24:RxErrorHandler:2.0.0",
 
                 //tools
                 "dagger2"                  : "com.google.dagger:dagger:${version["dagger2SdkVersion"]}",

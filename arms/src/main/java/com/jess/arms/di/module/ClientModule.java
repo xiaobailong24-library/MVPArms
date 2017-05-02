@@ -19,6 +19,8 @@ import dagger.Module;
 import dagger.Provides;
 import io.rx_cache2.internal.RxCache;
 import io.victoralbertos.jolyglot.GsonSpeaker;
+import me.xiaobailong24.rxerrorhandler.core.RxErrorHandler;
+import me.xiaobailong24.rxerrorhandler.handler.listener.ResponseErrorListener;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -127,6 +129,20 @@ public class ClientModule {
         return DataHelper.makeDirs(cacheDirectory);
     }
 
+    /**
+     * 提供处理Rxjava错误的管理器
+     *
+     * @return
+     */
+    @Singleton
+    @Provides
+    RxErrorHandler proRxErrorHandler(Application application, ResponseErrorListener listener) {
+        return RxErrorHandler
+                .builder()
+                .with(application)
+                .responseErrorListener(listener)
+                .build();
+    }
 
     public interface RetrofitConfiguration {
         RetrofitConfiguration EMPTY = (context, builder) -> {

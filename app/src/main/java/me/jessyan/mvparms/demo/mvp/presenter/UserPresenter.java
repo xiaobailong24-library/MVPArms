@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.jess.arms.base.DefaultAdapter;
 import com.jess.arms.di.scope.ActivityScope;
-import com.jess.arms.http.RetryWithDelay;
 import com.jess.arms.integration.AppManager;
 import com.jess.arms.mvp.BasePresenter;
 import com.jess.arms.utils.PermissionUtil;
@@ -20,6 +19,9 @@ import me.jessyan.mvparms.demo.app.utils.RxUtils;
 import me.jessyan.mvparms.demo.mvp.contract.UserContract;
 import me.jessyan.mvparms.demo.mvp.model.entity.User;
 import me.jessyan.mvparms.demo.mvp.ui.adapter.UserAdapter;
+import me.xiaobailong24.rxerrorhandler.core.RxErrorHandler;
+import me.xiaobailong24.rxerrorhandler.handler.ErrorHandleSubscriber;
+import me.xiaobailong24.rxerrorhandler.handler.RetryWithDelay;
 
 /**
  * Created by jess on 9/4/16 10:59
@@ -27,6 +29,7 @@ import me.jessyan.mvparms.demo.mvp.ui.adapter.UserAdapter;
  */
 @ActivityScope
 public class UserPresenter extends BasePresenter<UserContract.Model, UserContract.View> {
+    private RxErrorHandler mErrorHandler;
     private AppManager mAppManager;
     private Application mApplication;
     private List<User> mUsers = new ArrayList<>();
@@ -37,11 +40,12 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
 
 
     @Inject
-    public UserPresenter(UserContract.Model model, UserContract.View rootView,
+    public UserPresenter(UserContract.Model model, UserContract.View rootView, RxErrorHandler handler,
                          AppManager appManager, Application application) {
         super(model, rootView);
-        this.mApplication = application;
+        this.mErrorHandler = handler;
         this.mAppManager = appManager;
+        this.mApplication = application;
         mAdapter = new UserAdapter(mUsers);
         mRootView.setAdapter(mAdapter);//设置Adapter
     }
@@ -50,7 +54,7 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
         //请求外部存储权限用于适配android6.0的权限管理机制
         PermissionUtil.externalStorage(() -> {
             //request permission success, do something.
-        }, mRootView.getRxPermissions(), mRootView);
+        }, mRootView.getRxPermissions(), mRootView, mErrorHandler);
 
 
         if (pullToRefresh)
@@ -84,16 +88,18 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
                         mRootView.endLoadMore();//隐藏下拉加载更多的进度条
                 })
                 .compose(RxUtils.bindToLifecycle(mRootView))//使用RXlifecycle,使subscription和activity一起销毁
-                .subscribe(users -> {
-                    lastUserId = users.get(users.size() - 1).getId();//记录最后一个id,用于下一次请求
-                    if (pullToRefresh)
-                        mUsers.clear();//如果是上拉刷新则清空列表
-                    preEndIndex = mUsers.size();//更新之前列表总长度,用于确定加载更多的起始位置
-                    mUsers.addAll(users);
-                    if (pullToRefresh)
-                        mAdapter.notifyDataSetChanged();
-                    else
-                        mAdapter.notifyItemRangeInserted(preEndIndex, users.size());
+                .subscribe(new ErrorHandleSubscriber<List<User>>(mErrorHandler) {
+                    @Override
+                    public void onNext(List<User> users) {
+                        lastUserId = users.get(users.size() - 1).getId();//记录最后一个id,用于下一次请求
+                        if (pullToRefresh) mUsers.clear();//如果是上拉刷新则清空列表
+                        preEndIndex = mUsers.size();//更新之前列表总长度,用于确定加载更多的起始位置
+                        mUsers.addAll(users);
+                        if (pullToRefresh)
+                            mAdapter.notifyDataSetChanged();
+                        else
+                            mAdapter.notifyItemRangeInserted(preEndIndex, users.size());
+                    }
                 });
     }
 
@@ -102,6 +108,7 @@ public class UserPresenter extends BasePresenter<UserContract.Model, UserContrac
         super.onDestroy();
         this.mAdapter = null;
         this.mUsers = null;
+        this.mErrorHandler = null;
         this.mAppManager = null;
         this.mApplication = null;
     }

@@ -97,7 +97,13 @@ public class GlobalConfiguration implements ConfigModule {
                         return request;
                     }
                 })
-                .gsonConfiguration((context12, gsonBuilder) -> {//这里可以自己自定义配置Gson的参数
+                .responseErrorListener((context1, e) -> {
+                    /* 用来提供处理所有错误的监听
+                       rxjava必要要使用ErrorHandleSubscriber(默认实现Subscriber的onError方法),此监听才生效 */
+                    Timber.w("------------>" + e.getMessage());
+                    UiUtils.SnackbarText("net error");
+                })
+                .gsonConfiguration((context1, gsonBuilder) -> {//这里可以自己自定义配置Gson的参数
                     gsonBuilder
                             .serializeNulls()//支持序列化null的参数
                             .enableComplexMapKeySerialization();//支持将序列化key为object的map,默认只能序列化key为string的map
@@ -107,7 +113,8 @@ public class GlobalConfiguration implements ConfigModule {
                 })
                 .okhttpConfiguration((context1, okhttpBuilder) -> {//这里可以自己自定义配置Okhttp的参数
                     okhttpBuilder.writeTimeout(10, TimeUnit.SECONDS);
-                }).rxCacheConfiguration((context1, rxCacheBuilder) -> {//这里可以自己自定义配置RxCache的参数
+                })
+                .rxCacheConfiguration((context1, rxCacheBuilder) -> {//这里可以自己自定义配置RxCache的参数
             rxCacheBuilder.useExpiredDataIfLoaderNotAvailable(true);
         });
     }
