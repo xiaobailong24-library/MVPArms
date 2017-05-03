@@ -12,6 +12,9 @@ import org.simple.eventbus.EventBus;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
+
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * Created by jess on 29/04/2017 16:12
@@ -83,8 +86,12 @@ public class FragmentDelegateImpl implements FragmentDelegate {
 
     @Override
     public void onDestroyView() {
-        if (mUnbinder != null)
-            mUnbinder.unbind();
+        if (mUnbinder != Unbinder.EMPTY)
+            try {
+                mUnbinder.unbind();
+            } catch (IllegalStateException e) {
+                Timber.tag(TAG).w("onDestroyView: " + e.getMessage());
+            }
     }
 
     @Override
