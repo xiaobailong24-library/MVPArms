@@ -1,6 +1,6 @@
 package me.jessyan.mvparms.demo.mvp.model;
 
-import com.jess.arms.di.scope.ActivityScope;
+import com.jess.arms.di.scope.FragmentScope;
 import com.jess.arms.integration.IRepositoryManager;
 import com.jess.arms.mvp.BaseModel;
 
@@ -22,7 +22,7 @@ import me.jessyan.mvparms.demo.mvp.model.entity.User;
  * Created by jess on 9/4/16 10:56
  * Contact with jess.yan.effort@gmail.com
  */
-@ActivityScope
+@FragmentScope
 public class UserModel extends BaseModel implements UserContract.Model {
     public static final int USERS_PER_PAGE = 10;
 

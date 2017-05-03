@@ -3,7 +3,7 @@ package me.jessyan.mvparms.demo.mvp.presenter;
 import android.app.Application;
 
 import com.jess.arms.base.DefaultAdapter;
-import com.jess.arms.di.scope.ActivityScope;
+import com.jess.arms.di.scope.FragmentScope;
 import com.jess.arms.integration.AppManager;
 import com.jess.arms.mvp.BasePresenter;
 import com.jess.arms.utils.PermissionUtil;
@@ -27,7 +27,7 @@ import me.xiaobailong24.rxerrorhandler.handler.RetryWithDelay;
  * Created by jess on 9/4/16 10:59
  * Contact with jess.yan.effort@gmail.com
  */
-@ActivityScope
+@FragmentScope
 public class UserPresenter extends BasePresenter<UserContract.Model, UserContract.View> {
     private RxErrorHandler mErrorHandler;
     private AppManager mAppManager;

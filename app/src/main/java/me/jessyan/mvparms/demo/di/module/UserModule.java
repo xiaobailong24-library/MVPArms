@@ -1,6 +1,6 @@
 package me.jessyan.mvparms.demo.di.module;
 
-import com.jess.arms.di.scope.ActivityScope;
+import com.jess.arms.di.scope.FragmentScope;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,13 +23,13 @@ public class UserModule {
         this.view = view;
     }
 
-    @ActivityScope
+    @FragmentScope
     @Provides
     UserContract.View provideUserView(){
         return this.view;
     }
 
-    @ActivityScope
+    @FragmentScope
     @Provides
     UserContract.Model provideUserModel(UserModel model){
         return model;

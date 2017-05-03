@@ -2,6 +2,8 @@ package com.jess.arms.base.delegate;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 
 import com.jess.arms.base.App;
@@ -94,6 +96,34 @@ public class FragmentDelegateImpl implements FragmentDelegate {
 
     @Override
     public void onDetach() {
+
+    }
+
+    /**
+     * Created by xiaobailong24 on 2017/5/3 16:44
+     * fix java.io.NotSerializableException
+     */
+    public static final Parcelable.Creator<FragmentDelegateImpl> CREATOR
+            = new Parcelable.Creator<FragmentDelegateImpl>() {
+
+        @Override
+        public FragmentDelegateImpl createFromParcel(Parcel source) {
+            return null;
+        }
+
+        @Override
+        public FragmentDelegateImpl[] newArray(int size) {
+            return new FragmentDelegateImpl[0];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
 
     }
 }
