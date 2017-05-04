@@ -3,7 +3,6 @@ package com.jess.arms.base.delegate;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.jess.arms.base.App;
 
@@ -68,24 +67,6 @@ public class ActivityDelegateImpl implements ActivityDelegate {
         this.mActivity = null;
     }
 
-    /**
-     * Created by xiaobailong24 on 2017/5/3 16:44
-     * fix java.io.NotSerializableException
-     */
-    public static final Parcelable.Creator<ActivityDelegateImpl> CREATOR
-            = new Parcelable.Creator<ActivityDelegateImpl>() {
-
-        @Override
-        public ActivityDelegateImpl createFromParcel(Parcel source) {
-            return null;
-        }
-
-        @Override
-        public ActivityDelegateImpl[] newArray(int size) {
-            return new ActivityDelegateImpl[0];
-        }
-    };
-
     @Override
     public int describeContents() {
         return 0;
@@ -95,4 +76,22 @@ public class ActivityDelegateImpl implements ActivityDelegate {
     public void writeToParcel(Parcel dest, int flags) {
 
     }
+
+    protected ActivityDelegateImpl(Parcel in) {
+        this.mActivity = in.readParcelable(Activity.class.getClassLoader());
+        this.iActivity = in.readParcelable(IActivity.class.getClassLoader());
+        this.mUnbinder = in.readParcelable(Unbinder.class.getClassLoader());
+    }
+
+    public static final Creator<ActivityDelegateImpl> CREATOR = new Creator<ActivityDelegateImpl>() {
+        @Override
+        public ActivityDelegateImpl createFromParcel(Parcel source) {
+            return new ActivityDelegateImpl(source);
+        }
+
+        @Override
+        public ActivityDelegateImpl[] newArray(int size) {
+            return new ActivityDelegateImpl[size];
+        }
+    };
 }

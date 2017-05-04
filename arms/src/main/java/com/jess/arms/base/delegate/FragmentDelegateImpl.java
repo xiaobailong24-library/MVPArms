@@ -3,7 +3,8 @@ package com.jess.arms.base.delegate;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 
 import com.jess.arms.base.App;
@@ -12,6 +13,7 @@ import org.simple.eventbus.EventBus;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
 
 /**
  * Created by jess on 29/04/2017 16:12
@@ -83,13 +85,15 @@ public class FragmentDelegateImpl implements FragmentDelegate {
 
     @Override
     public void onDestroyView() {
-        if (mUnbinder != null)
+        if (mUnbinder != null && mUnbinder != mUnbinder.EMPTY) {
             try {
                 mUnbinder.unbind();
             } catch (IllegalStateException e) {
-                //fix Bindings already cleared
                 e.printStackTrace();
+                //fix Bindings already cleared
+                Timber.w("onDestroyView: " + e.getMessage());
             }
+        }
     }
 
     @Override
@@ -97,30 +101,15 @@ public class FragmentDelegateImpl implements FragmentDelegate {
         if (iFragment.useEventBus())//如果要使用eventbus请将此方法返回true
             EventBus.getDefault().unregister(mFragment);//注册到事件主线
         this.mUnbinder = null;
+        this.mFragmentManager = null;
+        this.mFragment = null;
+        this.iFragment = null;
     }
 
     @Override
     public void onDetach() {
 
     }
-
-    /**
-     * Created by xiaobailong24 on 2017/5/3 16:44
-     * fix java.io.NotSerializableException
-     */
-    public static final Parcelable.Creator<FragmentDelegateImpl> CREATOR
-            = new Parcelable.Creator<FragmentDelegateImpl>() {
-
-        @Override
-        public FragmentDelegateImpl createFromParcel(Parcel source) {
-            return null;
-        }
-
-        @Override
-        public FragmentDelegateImpl[] newArray(int size) {
-            return new FragmentDelegateImpl[0];
-        }
-    };
 
     @Override
     public int describeContents() {
@@ -131,4 +120,23 @@ public class FragmentDelegateImpl implements FragmentDelegate {
     public void writeToParcel(Parcel dest, int flags) {
 
     }
+
+    protected FragmentDelegateImpl(Parcel in) {
+        this.mFragmentManager = in.readParcelable(FragmentManager.class.getClassLoader());
+        this.mFragment = in.readParcelable(Fragment.class.getClassLoader());
+        this.iFragment = in.readParcelable(IFragment.class.getClassLoader());
+        this.mUnbinder = in.readParcelable(Unbinder.class.getClassLoader());
+    }
+
+    public static final Creator<FragmentDelegateImpl> CREATOR = new Creator<FragmentDelegateImpl>() {
+        @Override
+        public FragmentDelegateImpl createFromParcel(Parcel source) {
+            return new FragmentDelegateImpl(source);
+        }
+
+        @Override
+        public FragmentDelegateImpl[] newArray(int size) {
+            return new FragmentDelegateImpl[size];
+        }
+    };
 }
